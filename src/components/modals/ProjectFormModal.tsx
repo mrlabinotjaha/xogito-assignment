@@ -27,6 +27,7 @@ export default function ProjectFormModal({ isOpen, onClose, project, users }: Pr
     formState: { errors },
   } = useForm<Project>({
     defaultValues: {
+      id: project ? project.id : '0',
       name: project ? project.name : '',
       description: project ? project.description : '',
       owner: project ? project.owner.toString() : '',

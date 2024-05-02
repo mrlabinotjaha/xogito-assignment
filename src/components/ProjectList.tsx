@@ -4,7 +4,6 @@ import Button from '@mui/material/Button'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
@@ -14,9 +13,8 @@ import { Project, Projects } from '../types/types'
 import ProjectFormModal from './modals/ProjectFormModal'
 import TableFooter from './table/TableFooter'
 import TableHeader from './table/TableHeader'
-import TableSkeleton from './table/TableSkeleton'
 import Search from './Search'
-import { Status } from '../types/enums'
+import TableWrapper from './table/TableWrapper'
 
 export default function ProjectsList({ projects, status, users }: Projects) {
   const [page, setPage] = useState(0)
@@ -70,18 +68,9 @@ export default function ProjectsList({ projects, status, users }: Projects) {
         </Button>
       </Box>
       <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 210px)', marginTop: 3 }}>
-        {status === Status.LOADING ? (
-          <TableSkeleton />
-        ) : status === Status.FAILED ? (
-          <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" color="error">
-              There was a problem loading the data. Please try again later.
-            </Typography>
-          </Box>
-        ) : (
+        <TableWrapper status={status || ''}>
           <Table sx={{ minWidth: 500 }} stickyHeader aria-label="sticky table">
             <TableHeader />
-
             <TableBody>
               {(rowsPerPage > 0 ? filteredProjects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : filteredProjects).map((row) => (
                 <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
@@ -102,7 +91,7 @@ export default function ProjectsList({ projects, status, users }: Projects) {
               )}
             </TableBody>
           </Table>
-        )}
+        </TableWrapper>
       </TableContainer>
       <TableFooter projectsLength={filteredProjects.length} page={page} rowsPerPage={rowsPerPage} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
     </Box>

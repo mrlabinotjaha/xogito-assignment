@@ -3,7 +3,8 @@ import { Project, ProjectsState } from '../../types/types'
 import { Status } from '../../types/enums'
 
 export const fetchProjects = createAsyncThunk<Project[], void>('projects/fetchProjects', async () => {
-  const response = await fetch('http://localhost:3001/projects')
+  const baseUrl: any = process.env.REACT_APP_API_BASE_URL
+  const response = await fetch(`${baseUrl}/projects`)
   const data: Project[] = await response.json()
 
   // Simulate a delay to show the skeleton component.

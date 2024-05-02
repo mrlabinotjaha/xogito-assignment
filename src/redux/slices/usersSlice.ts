@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { UsersState } from '../../types/types'
+import { UsersState, User } from '../../types/types'
 import { Status } from '../../types/enums'
 
-export const fetchUsers = createAsyncThunk('projects/fetchUsers', async () => {
-  const response = await fetch('http://localhost:3001/users')
+export const fetchUsers = createAsyncThunk<User[], void>('users/fetchUsers', async () => {
+  const baseUrl: any = process.env.REACT_APP_API_BASE_URL
+  const response = await fetch(`${baseUrl}/users`)
   const data = await response.json()
   return data
 })
