@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react'
-import Search from './Search'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
+import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
-
 import { Edit } from '@mui/icons-material'
 import { Project, Projects } from '../types/types'
 import ProjectFormModal from './modals/ProjectFormModal'
 import TableFooter from './table/TableFooter'
 import TableHeader from './table/TableHeader'
 import TableSkeleton from './table/TableSkeleton'
+import Search from './Search'
+import { Status } from '../types/enums'
 
 export default function ProjectsList({ projects, status, users }: Projects) {
   const [page, setPage] = useState(0)
@@ -69,8 +70,14 @@ export default function ProjectsList({ projects, status, users }: Projects) {
         </Button>
       </Box>
       <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 210px)', marginTop: 3 }}>
-        {status === 'loading' ? (
+        {status === Status.LOADING ? (
           <TableSkeleton />
+        ) : status === Status.FAILED ? (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <Typography variant="h6" color="error">
+              There was a problem loading the data. Please try again later.
+            </Typography>
+          </Box>
         ) : (
           <Table sx={{ minWidth: 500 }} stickyHeader aria-label="sticky table">
             <TableHeader />

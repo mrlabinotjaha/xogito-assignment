@@ -3,7 +3,7 @@ import { UsersState } from '../../types/types'
 import { Status } from '../../types/enums'
 
 export const fetchUsers = createAsyncThunk('projects/fetchUsers', async () => {
-  const response = await fetch('http://localhost:3000/users')
+  const response = await fetch('http://localhost:3001/users')
   const data = await response.json()
   return data
 })

@@ -27,10 +27,9 @@ export default function ProjectFormModal({ isOpen, onClose, project, users }: Pr
     formState: { errors },
   } = useForm<Project>({
     defaultValues: {
-      id: project ? project.id : '0',
       name: project ? project.name : '',
       description: project ? project.description : '',
-      owner: project ? project.owner?.toString() : '',
+      owner: project ? project.owner.toString() : '',
     },
   })
   const dispatch = useDispatch()
@@ -47,27 +46,15 @@ export default function ProjectFormModal({ isOpen, onClose, project, users }: Pr
   }, [project, reset])
 
   const onSubmit: SubmitHandler<Project> = (data) => {
-    if (project) {
-      dispatch(
-        editProject({
-          id: data.id!,
-          name: data.name,
-          description: data.description,
-          owner: data.owner,
-        })
-      )
-    } else {
-      dispatch(
-        addProject({
-          id: Date.now().toString(),
-          name: data.name,
-          description: data.description,
-          owner: data.owner,
-        })
-      )
+    const projectData = {
+      id: data.id === '0' ? Date.now().toString() : data.id,
+      name: data.name,
+      description: data.description,
+      owner: data.owner,
     }
+    dispatch(project?.id ? editProject(projectData) : addProject(projectData))
     reset({
-      id: '',
+      id: '0',
       name: '',
       description: '',
       owner: '',
