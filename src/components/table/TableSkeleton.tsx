@@ -1,5 +1,3 @@
-// Import the necessary components
-import React from 'react'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Skeleton } from '@mui/material'
 
 const TableSkeleton = () => {

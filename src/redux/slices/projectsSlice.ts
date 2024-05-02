@@ -6,7 +6,6 @@ export const fetchProjects = createAsyncThunk<Project[], void>('projects/fetchPr
   const baseUrl: any = process.env.REACT_APP_API_BASE_URL
   const response = await fetch(`${baseUrl}/projects`)
   const data: Project[] = await response.json()
-
   // Simulate a delay to show the skeleton component.
   // const delayData = await new Promise<Project[]>((resolve) => setTimeout(() => resolve(data), 1000))
   return data
