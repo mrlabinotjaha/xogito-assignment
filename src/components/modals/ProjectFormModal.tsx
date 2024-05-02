@@ -41,10 +41,17 @@ export default function ProjectFormModal({ isOpen, onClose, project, users }: Pr
         id: project.id,
         name: project.name,
         description: project.description,
-        owner: project?.owner?.toString(),
+        owner: project?.owner?.toString() ?? '',
+      })
+    } else {
+      reset({
+        id: '',
+        name: '',
+        description: '',
+        owner: '',
       })
     }
-  }, [project, reset])
+  }, [project, reset, isOpen])
 
   const onSubmit: SubmitHandler<Project> = (data) => {
     const projectData = {
