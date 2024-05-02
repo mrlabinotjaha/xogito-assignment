@@ -1,89 +1,31 @@
-import { useState } from 'react'
-import { useTheme } from '@mui/material/styles'
+import { useState, useEffect } from 'react'
+import Search from './Search'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableFooter from '@mui/material/TableFooter'
-import TablePagination from '@mui/material/TablePagination'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
-import FirstPageIcon from '@mui/icons-material/FirstPage'
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
-import LastPageIcon from '@mui/icons-material/LastPage'
-import { User, Project } from '../types/types'
 
-interface TablePaginationActionsProps {
-  count: number
-  page: number
-  rowsPerPage: number
-  onPageChange: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void
-}
+import { Edit } from '@mui/icons-material'
+import { Project, Projects } from '../types/types'
+import ProjectFormModal from './modals/ProjectFormModal'
+import TableFooter from './table/TableFooter'
+import TableHeader from './table/TableHeader'
+import TableSkeleton from './table/TableSkeleton'
 
-function TablePaginationActions(props: TablePaginationActionsProps) {
-  const theme = useTheme()
-  const { count, page, rowsPerPage, onPageChange } = props
-
-  const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, 0)
-  }
-
-  const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, page - 1)
-  }
-
-  const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, page + 1)
-  }
-
-  const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1))
-  }
-
-  return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page">
-        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
-        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-      </IconButton>
-      <IconButton onClick={handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="next page">
-        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-      </IconButton>
-      <IconButton onClick={handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="last page">
-        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>
-  )
-}
-
-// const rows = [
-//   createData('Cupcake', 305, 3.7),
-//   createData('Donut', 452, 25.0),
-//   createData('Eclair', 262, 16.0),
-//   createData('Frozen yoghurt', 159, 6.0),
-//   createData('Gingerbread', 356, 16.0),
-//   createData('Honeycomb', 408, 3.2),
-//   createData('Ice cream sandwich', 237, 9.0),
-//   createData('Jelly Bean', 375, 0.0),
-//   createData('KitKat', 518, 26.0),
-//   createData('Lollipop', 392, 0.2),
-//   createData('Marshmallow', 318, 0),
-//   createData('Nougat', 360, 19.0),
-//   createData('Oreo', 437, 18.0),
-// ].sort((a, b) => (a.calories < b.calories ? -1 : 1))
-
-export default function ProjectList({ projects }: any) {
+export default function ProjectsList({ projects, status, users }: Projects) {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [searchText, setSearchText] = useState('')
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects)
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - projects.length) : 0
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredProjects.length) : 0
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage)
@@ -94,55 +36,68 @@ export default function ProjectList({ projects }: any) {
     setPage(0)
   }
 
+  const handleOpenModal = (project?: Project) => {
+    setSelectedProject(project ?? null)
+    setModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+    setSelectedProject(null)
+  }
+
+  const handleSearchChange = (debouncedValue: string) => {
+    setSearchText(debouncedValue)
+  }
+
+  const toUserName = (id: string): string => {
+    const user = users.find((user) => user.id === id)
+    return user ? user.name : ''
+  }
+
+  useEffect(() => {
+    setFilteredProjects(projects.filter((project: Project) => project.name.toLowerCase().includes(searchText.toLowerCase()) || project.description.toLowerCase().includes(searchText.toLowerCase())))
+  }, [searchText, projects])
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Owner</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(rowsPerPage > 0 ? projects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : projects).map((row: Project) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.id}</TableCell>
-              <TableCell style={{ width: 160 }}>{row.name}</TableCell>
-              <TableCell style={{ width: 160 }}>{row.description}</TableCell>
-              <TableCell style={{ width: 160 }}>{row.owner}</TableCell>
-            </TableRow>
-          ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
-            </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[10, 20, 30, { label: 'All', value: -1 }]}
-              colSpan={3}
-              count={projects.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              slotProps={{
-                select: {
-                  inputProps: {
-                    'aria-label': 'rows per page',
-                  },
-                  native: true,
-                },
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+    <Box sx={{ marginTop: 3 }}>
+      <ProjectFormModal isOpen={isModalOpen} onClose={handleCloseModal} project={selectedProject} users={users} />
+      <Box sx={{ textAlign: 'right', display: 'flex', justifyContent: 'space-between' }}>
+        <Search onChange={handleSearchChange} />
+        <Button variant="contained" color="primary" onClick={() => handleOpenModal()}>
+          Create Project
+        </Button>
+      </Box>
+      <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 210px)', marginTop: 3 }}>
+        {status === 'loading' ? (
+          <TableSkeleton />
+        ) : (
+          <Table sx={{ minWidth: 500 }} stickyHeader aria-label="sticky table">
+            <TableHeader />
+
+            <TableBody>
+              {(rowsPerPage > 0 ? filteredProjects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : filteredProjects).map((row) => (
+                <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.description}</TableCell>
+                  <TableCell>{toUserName(row.owner.toString())}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleOpenModal(row)} aria-label="edit">
+                      <Edit />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
+      </TableContainer>
+      <TableFooter projectsLength={filteredProjects.length} page={page} rowsPerPage={rowsPerPage} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
+    </Box>
   )
 }

@@ -1,25 +1,30 @@
 import ProjectList from '../components/ProjectList'
 import Container from '@mui/material/Container'
-import ApiService from '../api/apiService'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { RootState, AppDispatch } from '../store'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { fetchProjects } from '../redux/slices/projectsSlice'
+import { fetchUsers } from '../redux/slices/usersSlice'
 
 export default function Projects() {
-  const [projects, setProjects] = useState([])
+  const dispatch: AppDispatch = useDispatch()
+  const { projects, status: projectsStatus } = useSelector((state: RootState) => state.projects)
+  const { users, status: usersStatus } = useSelector((state: RootState) => state.users)
 
   useEffect(() => {
-    ApiService.fetchProjects()
-      .then((response) => {
-        setProjects(response.data)
-        console.log(response.data)
-      })
-      .catch((error) => {
-        console.error('Error fetching users:', error)
-      })
-  }, [])
+    if (projectsStatus === 'idle') {
+      dispatch(fetchProjects())
+    }
+
+    if (usersStatus === 'idle') {
+      dispatch(fetchUsers())
+    }
+  }, [dispatch, usersStatus, projectsStatus])
 
   return (
     <Container maxWidth="xl">
-      <ProjectList projects={projects} />
+      <ProjectList projects={projects} users={users} status={projectsStatus} />
     </Container>
   )
 }
