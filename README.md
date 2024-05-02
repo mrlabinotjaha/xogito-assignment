@@ -37,6 +37,11 @@ Create a simple React app and provide a public GitHub repository to the solution
 - e. Use react-hook-form library to handle form (optional)
 - f. Feel free to use any additional libraries that will help you
 
+## Screenshots
+
+<img width="754" alt="Screenshot 2024-05-02 at 2 50 31 PM" src="https://github.com/mrlabinotjaha/xogito-assignment/assets/20688195/5cc9f35e-94b2-4ecd-b86e-655b7c7ba543">
+<img width="754" alt="Screenshot 2024-05-02 at 2 51 16 PM" src="https://github.com/mrlabinotjaha/xogito-assignment/assets/20688195/c864cd89-f34f-415a-b100-4db6f47ed46d">
+
 ## Available Scripts
 
 In the project directory, you can run:
