@@ -46,7 +46,7 @@ Create a simple React app and provide a public GitHub repository to the solution
 
 In the project directory, you can run:
 
-### `npx json-server --port 3001`
+### `npx json-server src/data/db.json --port 3001`
 
 To set up a mock server and access it at [http://localhost:3001](http://localhost:3001) using json-server.
 
